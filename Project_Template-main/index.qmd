@@ -1,0 +1,74 @@
+# CASA00025 Group Project: Assessing the Impact of the Photovoltaic Heat Island Effect on Fish Farms in Southeastern Taiwan
+
+## Project Summary 
+
+In line with Net Zero 2050, the Taiwanese government has implemented an aquavoltaics (fishery–electricity symbiosis) policy in southeastern Taiwan since 2020. This initiative integrates solar panels into fish farms to generate renewable energy. However, concerns have arisen about potential environmental impacts, including the photovoltaic heat island (PVHI) effect. While some research suggests PVHI is minimal or even cooling in some areas (Xu et al., 2024), other studies report significant heat island effects of larfe solar power plants (Barron-Gafford et al., 2016). This project employs remote sensing (landset8?) and solar panel polygon data, using the XXX method, to assess PVHI impacts and compare conditions before and after policy implementation.
+
+:::{.column-page style="text-align: center;"}
+<iframe src='https://www.youtube.com/embed/nRabktbLZyA' width='80%' height='500px'></iframe>
+:::
+
+### Problem Statement 
+
+The main issue lies in the implementation of the aquavoltaics policy by Taiwan’s central government, which provides subsidies to fish farm landowners willing to install solar panels. However, from the perspective of local governments, the excessive installation of solar panels may lead to environmental concerns. Local residents are also worried about the potential heat island effect. Therefore, this project aims to assess the impact of solar panels on temperature through remote sensing analysis, and to develop a visual tool that allows both government authorities and local communities to better understand the environmental effects after solar panel installation.
+
+### End User 
+
+This application is being developed for two key groups: local communities in southeastern Taiwan, particularly fish farm landowners and residents, and government authorities involved in the planning and oversight of aquavoltaics projects.Currently, there is a lack of accessible tools for understanding how solar installations affect local microclimates.
+
+### Data
+1. Landsat 8 OLI_TIRS imagery?
+2. [Solar panel polygon data](https://github.com/kiang/moeaea.gov.tw)
+
+### Methodology
+
+How are you using this data to address the problem?
+
+### Interface
+
+How does your application's interface work to address the needs of your end user?
+
+## The Application 
+
+Replace the link below with the link to your application.
+
+:::{.column-page}
+
+<iframe src='https://ollielballinger.users.earthengine.app/view/turkey-earthquake' width='100%' height='700px'></iframe>
+
+:::
+
+
+## How it Works 
+
+Use this section to explain how your application works using code blocks and text explanations (no more than 500 words excluding code):
+
+## References
+
+Barron-Gafford, G., Minor, R., Allen, N., Cronin, A., Brooks, A., Pavao-Zuckerman, M. and Macknick, J., 2016. The Photovoltaic Heat Island Effect: Larger solar power plants increase local temperatures. Scientific Reports, 6, p.35070. [https://doi.org/10.1038/srep35070](https://doi.org/10.1038/srep35070)
+
+Xu, Z., Li, Y., Qin, Y. and Bach, E., 2024. A global assessment of the effects of solar farms on albedo, vegetation, and land surface temperature using remote sensing. Solar Energy, 268, p.112198. [https://doi.org/10.1016/j.solener.2023.112198](https://doi.org/10.1016/j.solener.2023.112198)
+
+
+
+```js
+Map.setCenter(35.51898, 33.90153, 15);
+
+Map.setOptions("satellite");
+
+var aoi = ee.Geometry.Point(35.51898, 33.90153).buffer(3000);
+```
+
+You can include images:
+
+![Pixelwise T-Test, 2018](images/beirut_change_2020.jpg)
+
+and math:
+$$ \Large t = {\frac{\overline{x_1}-\overline{x_2}} {\sqrt{\frac{s^2_1}{n_1} + \frac{s^2_2}{n_2}}}} $$
+
+
+
+
+
+
+
