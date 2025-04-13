@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+<body>
+<h2>Pix_Controller catch a exception</h2>
+Exception class: <strong>Exception</strong><br />
+Exception message: <strong>屏東鎮林邊鄉鎮安段963號 找不到對應縣市</strong><br />
+Stack trace: <br />
+<table border="1">
+    <tr>
+        <td>File</td>
+        <td>Line</td>
+        <td>Function</td>
+        <td>Arguments</td>
+    </tr>
+        <tr>
+        <td>/srv/web/webdata/models/SectionParser.php</td>
+        <td>113</td>
+        <td>SectionParser::split_city</td>
+        <td>
+            <ol>
+                                <li>
+                                string: 屏東鎮林邊鄉鎮安段963號                                </li>
+                            </ol>
+        </td>
+    </tr>
+        <tr>
+        <td>/srv/web/webdata/models/SectionParser.php</td>
+        <td>65</td>
+        <td>SectionParser::split_lot_number</td>
+        <td>
+            <ol>
+                                <li>
+                                string: 屏東鎮林邊鄉鎮安段963號                                </li>
+                            </ol>
+        </td>
+    </tr>
+        <tr>
+        <td>/srv/web/webdata/controllers/IndexController.php</td>
+        <td>72</td>
+        <td>SectionParser::parse</td>
+        <td>
+            <ol>
+                                <li>
+                                string: 屏東鎮林邊鄉鎮安段963號                                </li>
+                            </ol>
+        </td>
+    </tr>
+        <tr>
+        <td>/srv/web/webdata/stdlibs/pixframework/Pix/Controller.php</td>
+        <td>264</td>
+        <td>IndexController-&gt;searchAction</td>
+        <td>
+            <ol>
+                                <li>
+                                array(0)
+                                </li>
+                            </ol>
+        </td>
+    </tr>
+        <tr>
+        <td>/srv/web/index.php</td>
+        <td>9</td>
+        <td>Pix_Controller::dispatch</td>
+        <td>
+            <ol>
+                                <li>
+                                string: /srv/web/webdata/                                </li>
+                            </ol>
+        </td>
+    </tr>
+    </table>
+<hr>
+<div>
+    This is Pix_Controller default error page. If you want to modify this, you can add ErrorController.php in webdata/controllers/<br>
+    <a href="http://framework.pixnet.net" target="_blank">Pix Framework</a>
+</div>
+</body>
+</html>

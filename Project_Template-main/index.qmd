@@ -2,7 +2,7 @@
 
 ## Project Summary 
 
-In line with Net Zero 2050, the Taiwanese government has implemented an aquavoltaics (fishery–electricity symbiosis) policy in southeastern Taiwan since 2020. This initiative integrates solar panels into fish farms to generate renewable energy. However, concerns have arisen about potential environmental impacts, including the photovoltaic heat island (PVHI) effect. While some research suggests PVHI is minimal or even cooling in some areas (Xu et al., 2024), other studies report significant heat island effects of larfe solar power plants (Barron-Gafford et al., 2016). This project employs remote sensing (landset8?) and solar panel polygon data, using the XXX method, to assess PVHI impacts and compare conditions before and after policy implementation.
+In line with Net Zero 2050, the Taiwanese government has implemented an aquavoltaics (fishery–electricity symbiosis) policy in southeastern Taiwan since 2020. This initiative integrates solar panels into fish farms to generate renewable energy. However, concerns have arisen about potential environmental impacts, including the photovoltaic heat island (PVHI) effect. While some research suggests PVHI is minimal or even cooling in some areas (Xu et al., 2024), other studies report significant heat island effects of large solar power plants (Barron-Gafford et al., 2016). This project employs remote sensing (landset8?) and solar panel polygon data, using the XXX method, to assess PVHI impacts and compare conditions before and after policy implementation.
 
 :::{.column-page style="text-align: center;"}
 <iframe src='https://www.youtube.com/embed/nRabktbLZyA' width='80%' height='500px'></iframe>
