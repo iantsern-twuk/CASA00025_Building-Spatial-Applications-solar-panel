@@ -2,6 +2,9 @@
 
 ## Project Summary 
 
+Ian I don’t think we are meant to have any text in this section!!
+
+Original:
 In line with Net Zero 2050, the Taiwanese government has implemented an aquavoltaics (fishery–electricity symbiosis) policy in southeastern Taiwan since 2020. This initiative integrates solar panels into fish farms to generate renewable energy. However, concerns have arisen about potential environmental impacts, including the photovoltaic heat island (PVHI) effect. While some research suggests PVHI is minimal or even cooling in some areas (Xu et al., 2024), other studies report significant heat island effects of large solar power plants (Barron-Gafford et al., 2016). This project employs remote sensing (landset8?) and solar panel polygon data, using the XXX method, to assess PVHI impacts and compare conditions before and after policy implementation.
 
 :::{.column-page style="text-align: center;"}
@@ -9,23 +12,43 @@ In line with Net Zero 2050, the Taiwanese government has implemented an aquavolt
 :::
 
 ### Problem Statement 
+What is the problem you’re trying to address using this application?
 
+Ian’s original:
 The main issue lies in the implementation of the aquavoltaics policy by Taiwan’s central government, which provides subsidies to fish farm landowners willing to install solar panels. However, from the perspective of local governments, the excessive installation of solar panels may lead to environmental concerns. Local residents are also worried about the potential heat island effect. Therefore, this project aims to assess the impact of solar panels on temperature through remote sensing analysis, and to develop a visual tool that allows both government authorities and local communities to better understand the environmental effects after solar panel installation.
 
-### End User 
+Potential new paragraph? Needs cutting by 13 words
+Although renewable energy is crucial to meeting Taiwan’s Net Zero goals, land availability represents a critical constraint (Hsiao *et al.*, 2021). To address this, the Taiwanese government has implemented an aquavoltaics programme, integrating solar panels into fish farms to generate space-efficient energy. However, this initiative faces significant local opposition, with some authorities even banning construction due to concerns about socio-environmental impacts such as the photovoltaic heat island effect (PHVI). Academic assessments of PHVI find mixed results (Barron-Gafford et al., 2016; Xu et al., 2024). As such, there is a clear need for an accessible, evidence-based participatory planning tool to resolve local conflicts, overcome planning roadblocks, and provide a foundation for informed programme expansion.
 
-This application is being developed for two key groups: local communities in southeastern Taiwan, particularly fish farm landowners and residents, and government authorities involved in the planning and oversight of aquavoltaics projects.Currently, there is a lack of accessible tools for understanding how solar installations affect local microclimates.
+### End User 
+Who are you building this application for? How does it address a need this community has?
+
+Ian’s original:
+This application is being developed for two key groups: local communities in southeastern Taiwan, particularly fish farm landowners and residents, and government authorities involved in the planning and oversight of aquavoltaics projects. Currently, there is a lack of accessible tools for understanding how solar installations affect local microclimates.
+
+Potential alternative? Needs cutting by 8 words
+This application serves as a participatory planning tool to overcome conflicts between stakeholders with opposing perspectives on aquavoltaic expansion. It answers the question: What are the PHVI impacts of past solar farms, and what would the impact be for prospective future sites? Alongside expediting planning, helping mitigate local impacts, and supporting Taiwan’s Net Zero goals, additional benefits for each stakeholder are outlined below:
+
+- **National government:** communicating policy; mitigating unfounded concerns.
+- **Local government:** evidence-based assessment of past projects; informed future planning within jurisdictions.
+- **Fish farmers:** presenting a case for having solar panels installed on their sites.
+- **Local residents:** reducing concerns; empowering them to challenge decisions at higher governance levels.
 
 ### Data
-1. Landsat 8 OLI_TIRS imagery?
-2. [Solar panel polygon data](https://github.com/kiang/moeaea.gov.tw)
+What data are you using?
+1. Landsat 8 OLI_TIRS imagery at X resolution for temperature change assessments.
+2. Copernicus imagery at X resolution for fish farm identification.
+3. Solar panel polygons and construction dates from the [Taiwanese Civil Service.](https://github.com/kiang/moeaea.gov.tw). 
+4. Population estimates at 30m resolution from [Meta’s Data for Good](https://dataforgood.facebook.com/dfg/tools/high-resolution-population-density-maps)
+5. Digital elevation data at 30m resolution from the [NASA Shuttle Radar Topography Mission.](https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003)
+
 
 ### Methodology
-
 How are you using this data to address the problem?
 
-### Interface
+The application first assesses the PHVI impacts of past solar panel sites before predicting implications of future developments. First, land surface temperature (LST) before and after solar panel installation is calculated using the method detailed by Xu *et al.,* (2024), which XXX. A random forest model uses these LST changes, alongside optical and thermal imagery, slope, and elevation to predict temperature impacts at other sites. A second random forest identifies fish farms, ensuring users can only select prospective sites which could be included in the programme. Finally, predicted temperature change and local population estimates indicate the impact of developments on local communities.
 
+### Interface
 How does your application's interface work to address the needs of your end user?
 
 ## The Application 
@@ -34,7 +57,7 @@ Replace the link below with the link to your application.
 
 :::{.column-page}
 
-<iframe src='https://ollielballinger.users.earthengine.app/view/turkey-earthquake' width='100%' height='700px'></iframe>
+<iframe src='https://ee-iantserntw.projects.earthengine.app/view/pv-heat-impact-tracker' width='100%' height='700px'></iframe>
 
 :::
 
@@ -46,6 +69,8 @@ Use this section to explain how your application works using code blocks and tex
 ## References
 
 Barron-Gafford, G., Minor, R., Allen, N., Cronin, A., Brooks, A., Pavao-Zuckerman, M. and Macknick, J., 2016. The Photovoltaic Heat Island Effect: Larger solar power plants increase local temperatures. Scientific Reports, 6, p.35070. [https://doi.org/10.1038/srep35070](https://doi.org/10.1038/srep35070)
+
+Hsiao, Y.J., Chen, J.L. and Huang, C.T., 2021. What are the challenges and opportunities in implementing Taiwan's aquavoltaics policy? A roadmap for achieving symbiosis between small-scale aquaculture and photovoltaics. Energy Policy, 153, p.112264.
 
 Xu, Z., Li, Y., Qin, Y. and Bach, E., 2024. A global assessment of the effects of solar farms on albedo, vegetation, and land surface temperature using remote sensing. Solar Energy, 268, p.112198. [https://doi.org/10.1016/j.solener.2023.112198](https://doi.org/10.1016/j.solener.2023.112198)
 
@@ -65,6 +90,7 @@ You can include images:
 
 and math:
 $$ \Large t = {\frac{\overline{x_1}-\overline{x_2}} {\sqrt{\frac{s^2_1}{n_1} + \frac{s^2_2}{n_2}}}} $$
+
 
 
 

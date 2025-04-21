@@ -152,29 +152,38 @@ window.Quarto = {
 <h1>CASA00025 Group Project: Assessing the Impact of the Photovoltaic Heat Island Effect on Fish Farms in Southeastern Taiwan</h1>
 <section id="project-summary" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="project-summary">Project Summary</h2>
-<p>In line with Net Zero 2050, the Taiwanese government has implemented an aquavoltaics (fishery–electricity symbiosis) policy in southeastern Taiwan since 2020. This initiative integrates solar panels into fish farms to generate renewable energy. However, concerns have arisen about potential environmental impacts, including the photovoltaic heat island (PVHI) effect. While some research suggests PVHI is minimal or even cooling in some areas (Xu et al., 2024), other studies report significant heat island effects of large solar power plants (Barron-Gafford et al., 2016). This project employs remote sensing (landset8?) and solar panel polygon data, using the XXX method, to assess PVHI impacts and compare conditions before and after policy implementation.</p>
+<p>Ian I don’t think we are meant to have any text in this section!!</p>
+<p>Original: In line with Net Zero 2050, the Taiwanese government has implemented an aquavoltaics (fishery–electricity symbiosis) policy in southeastern Taiwan since 2020. This initiative integrates solar panels into fish farms to generate renewable energy. However, concerns have arisen about potential environmental impacts, including the photovoltaic heat island (PVHI) effect. While some research suggests PVHI is minimal or even cooling in some areas (Xu et al., 2024), other studies report significant heat island effects of large solar power plants (Barron-Gafford et al., 2016). This project employs remote sensing (landset8?) and solar panel polygon data, using the XXX method, to assess PVHI impacts and compare conditions before and after policy implementation.</p>
 <div class="column-page" style="text-align: center;">
 <iframe src="https://www.youtube.com/embed/nRabktbLZyA" width="80%" height="500px">
 </iframe>
 </div>
 <section id="problem-statement" class="level3">
 <h3 class="anchored" data-anchor-id="problem-statement">Problem Statement</h3>
-<p>The main issue lies in the implementation of the aquavoltaics policy by Taiwan’s central government, which provides subsidies to fish farm landowners willing to install solar panels. However, from the perspective of local governments, the excessive installation of solar panels may lead to environmental concerns. Local residents are also worried about the potential heat island effect. Therefore, this project aims to assess the impact of solar panels on temperature through remote sensing analysis, and to develop a visual tool that allows both government authorities and local communities to better understand the environmental effects after solar panel installation.</p>
+<p>What is the problem you’re trying to address using this application?</p>
+<p>Ian’s original: The main issue lies in the implementation of the aquavoltaics policy by Taiwan’s central government, which provides subsidies to fish farm landowners willing to install solar panels. However, from the perspective of local governments, the excessive installation of solar panels may lead to environmental concerns. Local residents are also worried about the potential heat island effect. Therefore, this project aims to assess the impact of solar panels on temperature through remote sensing analysis, and to develop a visual tool that allows both government authorities and local communities to better understand the environmental effects after solar panel installation.</p>
+<p>Potential new paragraph? Needs cutting by 13 words Although renewable energy is crucial to meeting Taiwan’s Net Zero goals, land availability represents a critical constraint (Hsiao <em>et al.</em>, 2021). To address this, the Taiwanese government has implemented an aquavoltaics programme, integrating solar panels into fish farms to generate space-efficient energy. However, this initiative faces significant local opposition, with some authorities even banning construction due to concerns about socio-environmental impacts such as the photovoltaic heat island effect (PHVI). Academic assessments of PHVI find mixed results (Barron-Gafford et al., 2016; Xu et al., 2024). As such, there is a clear need for an accessible, evidence-based participatory planning tool to resolve local conflicts, overcome planning roadblocks, and provide a foundation for informed programme expansion.</p>
 </section>
 <section id="end-user" class="level3">
 <h3 class="anchored" data-anchor-id="end-user">End User</h3>
-<p>This application is being developed for two key groups: local communities in southeastern Taiwan, particularly fish farm landowners and residents, and government authorities involved in the planning and oversight of aquavoltaics projects.Currently, there is a lack of accessible tools for understanding how solar installations affect local microclimates.</p>
+<p>Who are you building this application for? How does it address a need this community has?</p>
+<p>Ian’s original: This application is being developed for two key groups: local communities in southeastern Taiwan, particularly fish farm landowners and residents, and government authorities involved in the planning and oversight of aquavoltaics projects. Currently, there is a lack of accessible tools for understanding how solar installations affect local microclimates.</p>
+<p>Potential alternative? Needs cutting by 8 words This application serves as a participatory planning tool to overcome conflicts between stakeholders with opposing perspectives on aquavoltaic expansion. It answers the question: What are the PHVI impacts of past solar farms, and what would the impact be for prospective future sites? Alongside expediting planning, helping mitigate local impacts, and supporting Taiwan’s Net Zero goals, additional benefits for each stakeholder are outlined below:</p>
+<ul>
+<li><strong>National government:</strong> communicating policy; mitigating unfounded concerns.</li>
+<li><strong>Local government:</strong> evidence-based assessment of past projects; informed future planning within jurisdictions.</li>
+<li><strong>Fish farmers:</strong> presenting a case for having solar panels installed on their sites.</li>
+<li><strong>Local residents:</strong> reducing concerns; empowering them to challenge decisions at higher governance levels.</li>
+</ul>
 </section>
 <section id="data" class="level3">
 <h3 class="anchored" data-anchor-id="data">Data</h3>
-<ol type="1">
-<li>Landsat 8 OLI_TIRS imagery?</li>
-<li><a href="https://github.com/kiang/moeaea.gov.tw">Solar panel polygon data</a></li>
-</ol>
+<p>What data are you using? 1. Landsat 8 OLI_TIRS imagery at X resolution for temperature change assessments. 2. Copernicus imagery at X resolution for fish farm identification. 3. Solar panel polygons and construction dates from the <a href="https://github.com/kiang/moeaea.gov.tw">Taiwanese Civil Service.</a>. 4. Population estimates at 30m resolution from <a href="https://dataforgood.facebook.com/dfg/tools/high-resolution-population-density-maps">Meta’s Data for Good</a> 5. Digital elevation data at 30m resolution from the <a href="https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003">NASA Shuttle Radar Topography Mission.</a></p>
 </section>
 <section id="methodology" class="level3">
 <h3 class="anchored" data-anchor-id="methodology">Methodology</h3>
 <p>How are you using this data to address the problem?</p>
+<p>The application first assesses the PHVI impacts of past solar panel sites before predicting implications of future developments. First, land surface temperature (LST) before and after solar panel installation is calculated using the method detailed by Xu <em>et al.,</em> (2024), which XXX. A random forest model uses these LST changes, alongside optical and thermal imagery, slope, and elevation to predict temperature impacts at other sites. A second random forest identifies fish farms, ensuring users can only select prospective sites which could be included in the programme. Finally, predicted temperature change and local population estimates indicate the impact of developments on local communities.</p>
 </section>
 <section id="interface" class="level3">
 <h3 class="anchored" data-anchor-id="interface">Interface</h3>
@@ -185,7 +194,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="the-application">The Application</h2>
 <p>Replace the link below with the link to your application.</p>
 <div class="column-page">
-<iframe src="https://ollielballinger.users.earthengine.app/view/turkey-earthquake" width="100%" height="700px">
+<iframe src="https://ee-iantserntw.projects.earthengine.app/view/pv-heat-impact-tracker" width="100%" height="700px">
 </iframe>
 </div>
 </section>
@@ -196,6 +205,7 @@ window.Quarto = {
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
 <p>Barron-Gafford, G., Minor, R., Allen, N., Cronin, A., Brooks, A., Pavao-Zuckerman, M. and Macknick, J., 2016. The Photovoltaic Heat Island Effect: Larger solar power plants increase local temperatures. Scientific Reports, 6, p.35070. <a href="https://doi.org/10.1038/srep35070">https://doi.org/10.1038/srep35070</a></p>
+<p>Hsiao, Y.J., Chen, J.L. and Huang, C.T., 2021. What are the challenges and opportunities in implementing Taiwan’s aquavoltaics policy? A roadmap for achieving symbiosis between small-scale aquaculture and photovoltaics. Energy Policy, 153, p.112264.</p>
 <p>Xu, Z., Li, Y., Qin, Y. and Bach, E., 2024. A global assessment of the effects of solar farms on albedo, vegetation, and land surface temperature using remote sensing. Solar Energy, 268, p.112198. <a href="https://doi.org/10.1016/j.solener.2023.112198">https://doi.org/10.1016/j.solener.2023.112198</a></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">Map</span><span class="op">.</span><span class="fu">setCenter</span>(<span class="fl">35.51898</span><span class="op">,</span> <span class="fl">33.90153</span><span class="op">,</span> <span class="dv">15</span>)<span class="op">;</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
