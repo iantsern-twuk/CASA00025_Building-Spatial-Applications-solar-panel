@@ -139,58 +139,8 @@ var averageTempChange = lstDiffValues.reduce(ee.Reducer.mean());
 var maxTempChange = lstDiffValues.reduce(ee.Reducer.max());
 var minTempChange = lstDiffValues.reduce(ee.Reducer.min());
 
-// visualize summary statistics
-var statCardsPanel = ui.Panel({
-  layout: ui.Panel.Layout.flow('horizontal'),
-  style: {stretch: 'horizontal', margin: '10px 0'}
-});
-
-//Add a loading screen before the stats are calculated
-var loadingCard = ui.Label('Loading maximum, minimum, and average temperature change...', {
-  fontSize: '14px',
-  color: 'gray',
-});
-statCardsPanel.add(loadingCard);
-
-function createStatCard(label, value, color,textColor) {
-  return ui.Panel([
-    ui.Label(label, {
-      fontWeight: 'bold',
-      fontSize: '14px',
-      color: textColor,
-      backgroundColor: color
-    }),
-    ui.Label(value, {
-      fontSize: '18px',
-      color: textColor,
-      backgroundColor: color
-    })
-  ], ui.Panel.Layout.flow('vertical'), {
-    padding: '10px',
-    backgroundColor: color,
-    borderRadius: '8px',
-    margin: '4px',
-    width: '30%'
-  });
-}
-
-// Add Stat Cards in the order: min, max, average
-minTempChange.evaluate(function(min) {
-  statCardsPanel.clear(); //remove the loading bit
-  statCardsPanel.add(createStatCard('Min Temp Change', min.toFixed(2) + ' °C', '#2166ac','white'));
-  
-  averageTempChange.evaluate(function(avg) {
-    statCardsPanel.add(createStatCard('Avg Temp Change', avg.toFixed(2) + ' °C', '#f7f7f7','black'));
-
-    maxTempChange.evaluate(function(max) {
-      statCardsPanel.add(createStatCard('Max Temp Change', max.toFixed(2) + ' °C', '#b2182b','white'));
-    });
-  });
-}); //we will load this into the UI later
-
 //Other brief stat: total number of polygons installed (app crashes with total area installed)
 var totalPanels = all_results.size()
-//print(totalPanels)
 
 // ----- Random forest ------
 
@@ -210,7 +160,7 @@ var allFeatures = validFeatures.map(function(feature) {
   var geom = feature.geometry();
   var meanElevation = elevation.reduceRegion({reducer: ee.Reducer.mean(), geometry: geom, scale: 30, maxPixels: 1e13}).get('elevation');
   var meanSlope = slope.reduceRegion({reducer: ee.Reducer.mean(), geometry: geom, scale: 30, maxPixels: 1e13}).get('slope');
-  var area = geom.area().divide(10000); //converting to hectares^2 as metres were overwhelming the model
+  var area = geom.area().divide(10000); //converting to hectares as metres were overwhelming the model
   return feature.set({
     'elevation': meanElevation,
     'slope': meanSlope,
@@ -223,7 +173,6 @@ var test = allFeatures.filter(ee.Filter.and(
   ee.Filter.neq('slope', null),
   ee.Filter.neq('area', null)
 ));
-//print('Number of panels with complete info:', test.size());
 
 //Extract training data
 var bands = test.select(['mean_preLST', 'mean_postLST', 'mean_LST_diff', 'NDVI', 'NDBI', 'FV', 'EM', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10', 'B11', 'elevation', 'slope', 'area'])
@@ -233,7 +182,6 @@ var bands = test.select(['mean_preLST', 'mean_postLST', 'mean_LST_diff', 'NDVI',
 var split = 0.7;
 var training_sample = bands.filter(ee.Filter.lt('random', split));
 var validation_sample = bands.filter(ee.Filter.gte('random', split));
-//print('Sample training feature:', training_sample.first());
 
 //Set up RF
 var model = ee.Classifier.smileRandomForest(100)
@@ -244,7 +192,7 @@ var model = ee.Classifier.smileRandomForest(100)
     //removed mean_preLST, EM, FV due to multicollinearity
     inputProperties: ['NDVI', 'NDBI', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10', 'B11', 'elevation', 'slope', 'area']});
 
-// ----- Assess GOF -----
+/*// ----- Assess GOF -----
 //As the practicals dealt with image classification, ChatGPT was used heavily here to find appropriate metrics    
 var validated = validation_sample.classify(model)
 
@@ -263,7 +211,7 @@ var residuals = predictionVsActual.map(function(f) {
   return f.set('residual', predicted.subtract(actual));
 });
 
-/*//Calculate RMSE
+//Calculate RMSE
 var mse = residuals.aggregate_array('residual').map(function(val) {
   val = ee.Number(val);
   return val.multiply(val);
@@ -331,11 +279,11 @@ var map = ui.Map();
 map.setOptions('SATELLITE');
 map.setCenter(120.10159388310306, 23.119258878572882, 13.5)
 
-//Add a legend
+//Add a legend: ChatGPT helped with the colourbar and label spacing
 var legend = ui.Panel({style: {position: 'bottom-left', padding: '8px 15px'}});
 var legendTitle = ui.Label({value: 'Temperature Difference (°C)', style: {fontWeight: 'bold', fontSize: '14px', margin: '0 0 4px 0'}});
 legend.add(legendTitle);
-//Set visualisation parameters
+//Set visualisation parameters - same as polygons
 var palette = palettes.colorbrewer.RdBu[9].reverse();
 var min = -6;
 var max = 6;
@@ -395,64 +343,6 @@ var buttons = {
 var buttonPanel = ui.Panel([buttons.visualize, buttons.predict], 
   ui.Panel.Layout.flow('horizontal'), {margin: '0 0 20px 0'});
 var contentContainer = ui.Panel();
-
-// Create charts and tabs
-var chartConfig = {
-  tempDist: {
-    data: sample,
-    xField: 'mean_LST_diff',
-    yField: null,
-    color: '#FE8789',
-    chartType: 'histogram',
-    options: {
-      title: 'What is the distribution of temperature change?',
-      hAxis: {title: 'Temperature Change (°C)'},
-      vAxis: {title: 'Number of Solar Farms'},
-      legend: {position: 'none'},
-      colors: ['#FE8789']
-    }
-  },
-  popDist: {
-    data: sample,
-    xField: 'total_buffer_pop',
-    yField: null,
-    color: '#A902A9',
-    chartType: 'histogram',
-    options: {
-      title: 'How many people typically live near a solar farm?',
-      hAxis: {title: 'Total Population Within 730m'},
-      vAxis: {title: 'Number of Solar Farms'},
-      legend: {position: 'none'},
-      colors: ['#A902A9']
-    }
-  },
-  tempVsArea: {
-    data: allFeatures.filter(ee.Filter.notNull(['area', 'mean_LST_diff'])),
-    xField: 'area',
-    yField: 'mean_LST_diff',
-    color: '#ff8800',
-    chartType: 'scatter',
-    options: {
-      title: 'Solar Panel Area vs Temperature Change',
-      hAxis: {
-        title: 'Area (ha²)',
-        scaleType: 'log',
-        format: 'short'
-      },
-      vAxis: {
-        title: 'Temperature Change (°C)',
-        viewWindow: {
-          min: -1,
-          max: 5
-        }
-      },
-      pointSize: 1,
-      colors: ['#ff8800'],
-      legend: {position: 'none'},
-      chartArea: {width: '85%', height: '80%'}
-    }
-  }
-};
 
 // ----- Load Layers -----
 
@@ -538,7 +428,7 @@ visualizeContent.add(totalPanelsLabel);
 
 totalPanels.evaluate(function(count) { //replace when calculated
   visualizeContent.remove(totalPanelsLabel);
-  var boldLabel = ui.Label(String(count), { //XXX replace with actual date!
+  var boldLabel = ui.Label(String(count), {
     fontSize: '15px', fontWeight: 'bold', color: 'black', padding: '0', margin: '0 4px 0 0'});
   var regularLabel = ui.Label(' solar farms installed since March 2019.', {
     fontSize: '15px', color: 'black', padding: '0', margin: '0'});
@@ -550,7 +440,54 @@ totalPanels.evaluate(function(count) { //replace when calculated
   visualizeContent.widgets().insert(7, labelPanel); //make sure it's added in same position as before - ChatGPT helped
 });
 
-//Add max, min, average panel
+//Add summary statistics
+var statCardsPanel = ui.Panel({
+  layout: ui.Panel.Layout.flow('horizontal'),
+  style: {stretch: 'horizontal', margin: '10px 0'}
+});
+
+//Add a loading screen before the stats are calculated
+var loadingCard = ui.Label('Loading maximum, minimum, and average temperature change...', {
+  fontSize: '14px',
+  color: 'gray',
+});
+statCardsPanel.add(loadingCard);
+
+function createStatCard(label, value, color,textColor) {
+  return ui.Panel([
+    ui.Label(label, {
+      fontWeight: 'bold',
+      fontSize: '14px',
+      color: textColor,
+      backgroundColor: color
+    }),
+    ui.Label(value, {
+      fontSize: '18px',
+      color: textColor,
+      backgroundColor: color
+    })
+  ], ui.Panel.Layout.flow('vertical'), {
+    padding: '10px',
+    backgroundColor: color,
+    borderRadius: '8px',
+    margin: '4px',
+    width: '30%'
+  });
+}
+
+//Add Stat Cards in the order: min, max, average
+minTempChange.evaluate(function(min) {
+  statCardsPanel.clear(); //remove the loading bit
+  statCardsPanel.add(createStatCard('Min Temp Change', min.toFixed(2) + ' °C', '#2166ac','white'));
+  
+  averageTempChange.evaluate(function(avg) {
+    statCardsPanel.add(createStatCard('Avg Temp Change', avg.toFixed(2) + ' °C', '#f7f7f7','black'));
+
+    maxTempChange.evaluate(function(max) {
+      statCardsPanel.add(createStatCard('Max Temp Change', max.toFixed(2) + ' °C', '#b2182b','white'));
+    });
+  });
+});
 visualizeContent.add(statCardsPanel);
 
 // add chart label and container
@@ -581,15 +518,19 @@ var popDistChart = ui.Chart.feature.histogram({
   colors: ['#A902A9']
 });
 
+var nicerName = allFeatures.map(function(feature) { //improve appearance
+  return feature.set('Temperature Change (°C)', feature.get('mean_LST_diff'));
+});
+
 var tempVsAreaChart = ui.Chart.feature.byFeature(
-  allFeatures.filter(ee.Filter.notNull(['area', 'mean_LST_diff'])),
+  nicerName.filter(ee.Filter.notNull(['area', 'Temperature Change (°C)'])),
   'area',
-  'mean_LST_diff'
+  'Temperature Change (°C)'
 ).setChartType('ScatterChart')
  .setOptions({
-   title: 'Solar Panel Area vs Temperature Change',
+   title: 'Is there a relationship between solar farm area and temperature?',
    hAxis: {
-     title: 'Area (ha²)',
+     title: 'Logged Area (hectares)',
      scaleType: 'log',
      format: 'short'
    },
@@ -603,7 +544,8 @@ var tempVsAreaChart = ui.Chart.feature.byFeature(
    pointSize: 1,
    colors: ['#ff8800'],
    legend: {position: 'none'},
-   chartArea: {width: '85%', height: '80%'}
+   chartArea: {width: '85%', height: '80%'},
+   series: {0: {labelInLegend: 'Temp Change (°C)'}}
  });
 
 // Create a container for all charts
@@ -721,23 +663,11 @@ function showPanel(panel, activeButton, inactiveButton) {
   inactiveButton.style().set({fontWeight: 'bold'});
 }
 
-// Helper functions for UI components
-function createSlider(label, min, current) {
-  var panel = ui.Panel({style: {margin: '5px 0'}});
-  panel.add(ui.Label(label, {margin: '2px 0'}));
-  var slider = ui.Panel({layout: ui.Panel.Layout.flow('horizontal'), style: {margin: '2px 0', padding: '0'}});
-  slider.add(ui.Label(min, {margin: '0', fontSize: '10px'}))
-    .add(ui.Panel({style: {width: '200px', height: '5px', backgroundColor: '#000000', margin: '7px 5px'}}))
-    .add(ui.Label(current, {margin: '0', fontSize: '14px', textAlign: 'right'}));
-  return panel.add(slider);
-}
-
 // Assemble UI and initialize
 mainPanel.add(buttonPanel);
 mainPanel.add(contentContainer);
 
 // Feature to click on solar farm polygons for more info:
-// Declare vars globally
 var panel = null;
 var highlightLayer = null;
 
@@ -817,13 +747,13 @@ map.onClick(function(coords) {
     panel.add(ui.Label('Solar Farm Summary:', {fontSize: '16px', fontWeight: 'bold', color: 'white', backgroundColor: '00000000'}))
          .add(ui.Label('Installation date: ' + props.dateright, {color: 'white', backgroundColor: '00000000'}))
          .add(ui.Label('Average temperature change: ' + props.mean_LST_diff.toFixed(2) + '°C', {color: 'white', backgroundColor: '00000000'}))
-         .add(ui.Label('Area: ' + props.area_hectare.toFixed(2) + 'hectares', {color: 'white', backgroundColor: '00000000'}))
+         .add(ui.Label('Area: ' + props.area_hectare.toFixed(2) + ' hectares', {color: 'white', backgroundColor: '00000000'}))
          .add(ui.Label('Potential population affected: ' + props.total_buffer_pop, {color: 'white', backgroundColor: '00000000'}))
          .add(closeButton);
   });
 });
 
-// ---------- Prediction panel ----------
+// ----------- Prediction panel ----------
 
 // Initialize default view
 showPanel(visualizeContent, buttons.visualize, buttons.predict);
@@ -903,7 +833,7 @@ map.drawingTools().onDraw(function(geometry) {
     if (intersects) {
 
     //Slightly changed version of the original analysis - does all calculations simultaneously to reduce waiting time
-      var computeScale = 30;  
+      var computeScale = 30;
       var feature = ee.Feature(geometry);
       var pop = popBuffer(feature); //run pop function from above
       var now = ee.Date(Date.now());
@@ -993,21 +923,3 @@ map.drawingTools().onDraw(function(geometry) {
     //drawButton.setDisabled(false);
   });
 });
-// modify createChart function to handle different chart types
-function createChart(data, xField, yField, color, chartType, options) {
-  if (chartType === 'histogram') {
-    return ui.Chart.feature.histogram({
-      features: data,
-      property: xField,
-      minBucketWidth: xField === 'mean_LST_diff' ? 0.1 : 50
-    }).setOptions(options);
-  } else {
-    var filteredData = data.filter(ee.Filter.and(
-      ee.Filter.notNull([xField]),
-      ee.Filter.notNull([yField])
-    ));
-    return ui.Chart.feature.byFeature(filteredData, xField, yField)
-      .setChartType('ScatterChart')
-      .setOptions(options);
-  }
-}
