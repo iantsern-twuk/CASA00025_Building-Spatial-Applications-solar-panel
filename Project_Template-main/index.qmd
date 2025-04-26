@@ -73,11 +73,9 @@ Supporting Future Planning and Stakeholder Discussion—The Predict tab enables 
 
 ## The Application 
 
-Replace the link below with the link to your application.
-
 :::{.column-page}
 
-<iframe src='https://ollielballinger.users.earthengine.app/view/turkey-earthquake' width='100%' height='700px'></iframe>
+<iframe src='https://ee-iantserntw.projects.earthengine.app/view/pv-heat-impact-tracker' width='100%' height='700px'></iframe>
 
 :::
 
