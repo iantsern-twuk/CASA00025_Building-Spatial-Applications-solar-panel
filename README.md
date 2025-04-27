@@ -25,7 +25,7 @@ Cerys, Ian, Jess, Jin
 #### App:
 ##### Analysis: Ian, Jess, Cerys, Jin
 - Solar panael data pre processing(in python): Ian
-- LST analysis: Jess
+- LST analysis: Jin
 - fish farm classification: Cerys
 - Temperature change prediction: Jess
 
