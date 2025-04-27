@@ -990,7 +990,7 @@ map.drawingTools().onDraw(function(geometry) {
 ### Links
 [Final app](https://ee-iantserntw.projects.earthengine.app/view/pv-heat-impact-tracker)
 
-[GithHub repository](https://github.com/jess-es02/SolarAppCode/tree/main)
+[GithHub repository](https://github.com/iantsern-twuk/CASA00025_Building-Spatial-Applications-solar-panel)
 
 
 ## References
