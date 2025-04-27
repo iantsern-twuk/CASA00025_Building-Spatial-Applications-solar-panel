@@ -2,42 +2,17 @@
 
 ## Project Summary 
 
-Ian I don’t think we are meant to have any text in this section!!
-Original:
-In line with Net Zero 2050, the Taiwanese government has implemented an aquavoltaics (fishery–electricity symbiosis) policy in southeastern Taiwan since 2020. This initiative integrates solar panels into fish farms to generate renewable energy. However, concerns have arisen about potential environmental impacts, including the photovoltaic heat island (PVHI) effect. While some research suggests PVHI is minimal or even cooling in some areas (Xu et al., 2024), other studies report significant heat island effects of large solar power plants (Barron-Gafford et al., 2016). This project employs remote sensing (landset8?) and solar panel polygon data, using the XXX method, to assess PVHI impacts and compare conditions before and after policy implementation.
+### Problem Statement 
+
+Although renewable energy is crucial to meeting Taiwan’s Net Zero goals, land availability represents a critical constraint (Hsiao *et al.*, 2021). To address this, the Taiwanese government has implemented an aquavoltaics programme, integrating solar panels into fish farms to generate space-efficient energy. However, this initiative faces significant local opposition, with some authorities even banning construction due to concerns about socio-environmental impacts such as temperature increases, known as the photovoltaic heat island effect (PHVI). There is a clear need for an accessible, evidence-based participatory planning tool to resolve local conflicts, overcome planning roadblocks, and provide a foundation for informed programme expansion.
 
 :::{.column-page style="text-align: center;"}
 <iframe src='https://www.youtube.com/embed/nRabktbLZyA' width='80%' height='500px'></iframe>
 :::
 
-### Problem Statement 
-What is the problem you’re trying to address using this application?
-
-Potential new paragraph? Needs cutting by 13 words
-Although renewable energy is crucial to meeting Taiwan’s Net Zero goals, land availability represents a critical constraint (Hsiao *et al.*, 2021). To address this, the Taiwanese government has implemented an aquavoltaics programme, integrating solar panels into fish farms to generate space-efficient energy. However, this initiative faces significant local opposition, with some authorities even banning construction due to concerns about socio-environmental impacts such as the photovoltaic heat island effect (PHVI). Academic assessments of PHVI find mixed results (Barron-Gafford et al., 2016; Xu et al., 2024). As such, there is a clear need for an accessible, evidence-based participatory planning tool to resolve local conflicts, overcome planning roadblocks, and provide a foundation for informed programme expansion.
-
-Cerys’s version (96 words)
-Although renewable energy is crucial to meeting Taiwan’s Net Zero goals, land availability represents a critical constraint (Hsiao *et al.*, 2021). To address this, the Taiwanese government has implemented an aquavoltaics programme, integrating solar panels into fish farms to generate space-efficient energy. However, this initiative faces significant local opposition, with some authorities even banning construction due to concerns about socio-environmental impacts such as the photovoltaic heat island effect (PHVI). There is a clear need for an accessible, evidence-based participatory planning tool to resolve local conflicts, overcome planning roadblocks, and provide a foundation for informed programme expansion.
-
-Ian’s original:
-The main issue lies in the implementation of the aquavoltaics policy by Taiwan’s central government, which provides subsidies to fish farm landowners willing to install solar panels. However, from the perspective of local governments, the excessive installation of solar panels may lead to environmental concerns. Local residents are also worried about the potential heat island effect. Therefore, this project aims to assess the impact of solar panels on temperature through remote sensing analysis, and to develop a visual tool that allows both government authorities and local communities to better understand the environmental effects after solar panel installation.
-
 ### End User 
-Who are you building this application for? How does it address a need this community has?
 
-Ian’s original:
-This application is being developed for two key groups: local communities in southeastern Taiwan, particularly fish farm landowners and residents, and government authorities involved in the planning and oversight of aquavoltaics projects. Currently, there is a lack of accessible tools for understanding how solar installations affect local microclimates.
-
-Potential alternative? Needs cutting by 4 words
-This application serves as a participatory planning tool to overcome conflicts between stakeholders with opposing perspectives on aquavoltaic expansion. It answers the question: What are the PHVI impacts of past solar farms, and what would the impact be in prospective future sites? Alongside expediting planning, helping mitigate local impacts, and supporting Taiwan’s Net Zero goals, additional benefits for each stakeholder are outlined below:
-
-- **National government:** communicating policy; mitigating unfounded concerns.
-- **Local government:** evidence-based assessment of past projects; informed future planning within jurisdictions.
-- **Fish farmers:** presenting a case for having solar panels installed on their sites.
-- **Local residents:** reducing concerns; empowering them to challenge decisions at higher governance levels.
-
-Cerys’s version (99 words)
-This application serves as a participatory planning tool to overcome conflicts between stakeholders with opposing perspectives on aquavoltaic expansion. It seeks to explore the PHVI impacts of past and prospective solar farms sites. Alongside expediting planning, helping mitigate local impacts, and supporting Taiwan’s Net Zero goals, additional benefits for each stakeholder are outlined below:
+This application serves as a participatory planning tool to overcome conflicts between stakeholders with opposing perspectives on aquavoltaic expansion. It does this by openly exploring the PHVI impacts of past and prospective solar farms sites. Alongside expediting planning, helping mitigate local impacts, and supporting Taiwan’s Net Zero goals, additional benefits for each stakeholder are outlined below:
 
 - **National government:** communicating policy; mitigating unfounded concerns.
 - **Local government:** evidence-based assessment of past projects; informed future planning within jurisdictions.
@@ -46,49 +21,120 @@ This application serves as a participatory planning tool to overcome conflicts b
 
 
 ### Data
-What data are you using?
-1. Landsat 8 OLI_TIRS imagery at X resolution for temperature change assessments.
+
+1. Landsat 8 Collection 1 Top of Atmosphere imagery at 30m resolution for temperature change assessments.
+
 2. Sentinel-2 imagery at 10m resolution for fish farm identification.
+
 3. Solar panel polygons and construction dates from the [Taiwanese Civil Service.](https://github.com/kiang/moeaea.gov.tw). 
 4. Population estimates at 30m resolution from [Meta’s Data for Good](https://dataforgood.facebook.com/dfg/tools/high-resolution-population-density-maps)
+
 5. Digital elevation data at 30m resolution from the [NASA Shuttle Radar Topography Mission.](https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003)
 
 
 ### Methodology
-How are you using this data to address the problem?
 
-The application first assesses the PHVI impacts of past solar panel sites before predicting implications of future developments. First, land surface temperature (LST) before and after solar panel installation is calculated using the method detailed by Xu *et al.,* (2024), which XXX. A random forest model uses these changes, alongside optical and thermal imagery, slope, and elevation to predict temperature impacts at other sites. A second random forest identifies fish farms, ensuring users can only select prospective sites which could be included in the programme. Finally, predicted temperature change and local population estimates indicate the impact of developments on local communities.
+First, land surface temperature (LST) before and after solar panel installation is calculated using the method detailed by Xu *et al.,* (2024), which averages satellite images for a period of three years before and after construction of the solar panel. A random forest model uses these changes, alongside optical and thermal imagery, slope, and elevation to predict temperature impacts at other sites. A second random forest identifies fish farms, ensuring users can only select prospective sites which could be included in the programme. Finally, predicted temperature change and local population estimates indicate the impact of developments on local communities.
 
 ### Interface
-Jess:
-The application provides a transparent, accessible tool to reduce silofication, overcome debate, and bring clarity to a contentious issue. The interface is divided into two: the Explore tab provides a broad overview of PHVI impacts through summary statistics and charts, while the Predict tab enables site-specific predictions, allowing users to tailor insights to their local context. Users can click on solar farms to receive a summary at any point, either supplementing the overview or facilitating comparisons with prospective sites. A blue-to-red colour scheme intuitively communicates temperature changes, and clear chart titles and disclaimers ensure the analysis is understandable to lay users.
-
-Ian’s
-Our interface focuses on two main goals:
-Simplicity and Intuitive Use – Users can easily explore how existing solar panels impact local temperatures through clear charts, colour-coded maps, and clickable summaries. The Explore tab provides an accessible overview, ensuring even non-experts can quickly understand key insights.
-
-
-Supporting Future Planning and Stakeholder Discussion—The Predict tab enables users to model the temperature impacts of proposed solar farms, helping diverse stakeholders make informed, collaborative decisions. The tool reduces silicification and brings clarity to a complex, often contentious issue.
-
+The application provides a transparent, accessible tool to foster communication, improve collaboration, and bring clarity to a contentious issue. The interface is divided into two: the Explore tab provides a broad overview of PHVI impacts through summary statistics and charts, while the Predict tab enables site-specific predictions, allowing users to tailor insights to their local context. Users can click on solar farms to receive a summary at any point, either supplementing the overview or facilitating comparisons with prospective sites. A blue-to-red colour scheme intuitively communicates temperature changes, and clear chart titles and disclaimers ensure the analysis is understandable and transparent.
 
 ## The Application 
 
 :::{.column-page}
 
-<iframe src='https://ee-iantserntw.projects.earthengine.app/view/pv-heat-impact-tracker' width='100%' height='700px'></iframe>
+<iframe src='https://ollielballinger.users.earthengine.app/view/turkey-earthquake' width='100%' height='700px'></iframe>
 
 :::
 
 
 ## How it Works 
 
-Use this section to explain how your application works using code blocks and text explanations (no more than 500 words excluding code):
-
 ### Analysis
 
 #### Data Processing
 
-Jin to add temperature change stuff! Please also mention that we keep NDVI, NBDI, and optical/thermal bands (excluding B8 and B9) for the random forest. Please keep it short - 50ish words maybe?
+First, the data collection is filtered with a 25% cloud cover threshold and mean pixel values are calculated for a period of 3 years pre- and post-construction of the solar panel. LST is calculated using the following equation: LST = (BT / (1 + (0.00115 * (BT / 1.4388)) * Ln(ε))) found in the USGS handbook (2019). Other indices like NDVI and NDBI are also calculated in this step for the prediction model. 
+
+```js
+// ------ LST Calculations ------
+
+function getLST(geom, start, end) {
+  var collection = ee.ImageCollection('LANDSAT/LC08/C02/T1_TOA')
+    .filterBounds(geom)
+    .filterDate(start, end)
+    .filter(ee.Filter.lt('CLOUD_COVER',25));
+
+  var lstCollection = collection.map(function(img) {
+    var ndvi = img.normalizedDifference(['B5', 'B4']).rename('NDVI');
+    var fv = ndvi.subtract(0).divide(1 - 0).rename('FV');
+    var em = fv.multiply(0.004).add(0.986).rename('EM');
+    var thermal = img.select('B10');
+    var lst = thermal.expression(
+      '(Tb / (1 + (0.00115 * (Tb / 1.438)) * log(Ep))) - 273.15',
+      {
+        'Tb': thermal,
+        'Ep': em
+      }
+    ).rename('LST');
+
+    //Extra variables for the random forest: optical bands, thermal bands, NDBI, and NDVI, FV, EM
+    var optical = img.select(['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7']);
+    var thermalBands = img.select(['B10', 'B11']);
+    var ndbi = img.normalizedDifference(['B6', 'B5']).rename('NDBI');
+    return lst.addBands([ndvi, fv, em, ndbi]).addBands(optical).addBands(thermalBands).copyProperties(img, img.propertyNames());
+  });
+
+  var mean = ee.Image(lstCollection.mean());
+  var bands = mean.bandNames();
+  var hasLST = bands.contains('LST');
+  return ee.Algorithms.If(hasLST, mean.clip(geom), ee.Image().rename('LST').clip(geom));
+}
+
+// Calculate LST for all polygons
+function calculateLST(feature) {
+  var dateString = ee.String(feature.get('dateright'));
+  var parts = dateString.split('-');
+  var year = ee.Number.parse(parts.get(0));
+  var month = ee.Number.parse(parts.get(1));
+  var day = ee.Number.parse(parts.get(2));
+  var constructDate = ee.Date.fromYMD(year, month, day);
+
+  var preStart = constructDate.advance(-3, 'year');
+  var preEnd = constructDate;
+  var postStart = constructDate.advance(1, 'year');
+  var postEnd = constructDate.advance(4, 'year');
+
+  var geom = feature.geometry();
+  var preImage = ee.Image(getLST(geom, preStart, preEnd));
+  var postImage = ee.Image(getLST(geom, postStart, postEnd));
+  var diff = postImage.select('LST').subtract(preImage.select('LST')).rename('LST_Difference');
+
+  // Reducers for LST calculations
+  var meanPreLSTDict = preImage.select('LST').reduceRegion({reducer: ee.Reducer.mean(), geometry: geom, scale: 30, maxPixels: 1e13});
+  var meanPostLSTDict = postImage.select('LST').reduceRegion({reducer: ee.Reducer.mean(), geometry: geom, scale: 30, maxPixels: 1e13});
+  var meanDiffDict = diff.reduceRegion({reducer: ee.Reducer.mean(), geometry: geom, scale: 30, maxPixels: 1e13});
+
+  // Reducers for other indices for RF
+  var preOpticalDict = preImage.select(['NDVI', 'FV', 'EM', 'NDBI', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10', 'B11']).reduceRegion({
+    reducer: ee.Reducer.mean(),
+    geometry: geom,
+    scale: 30,
+    maxPixels: 1e13
+  });
+
+  var meanPreLST = ee.Algorithms.If(meanPreLSTDict.contains('LST'), meanPreLSTDict.get('LST'), null);
+  var meanPostLST = ee.Algorithms.If(meanPostLSTDict.contains('LST'), meanPostLSTDict.get('LST'), null);
+  var meanDiff = ee.Algorithms.If(meanDiffDict.contains('LST_Difference'), meanDiffDict.get('LST_Difference'), null);
+
+  return feature.set({
+    'mean_preLST': meanPreLST,
+    'mean_postLST': meanPostLST,
+    'mean_LST_diff': meanDiff
+  }).set(preOpticalDict).setGeometry(feature.geometry());
+}
+var results = polygons.map(calculateLST);
+```
 
 Given local government and resident concerns about PHVI’s impact on surrounding communities, we define a function called popBuffer to sum estimated populations within 730 metres of solar farms: a distance typically affected by PHVI (Guoqing *et al.,* 2021).
 
@@ -111,7 +157,7 @@ function popBuffer(panel) {
 var all_results = results.map(popBuffer);
 ```
 
-Finally, due to their impact on LST (Šafanda, 1999), we load slope and elevation data and reduce these to the means for each solar polygon. We also calculate polygon areas in hectares squared.
+Finally, due to their impact on LST (Šafanda, 1999), we load slope and elevation data and reduce these to the means for each solar polygon. We also calculate polygon areas in hectares.
 
 ```js
 //Add extra non-Landsat features: elevation, topography, and polygon area
@@ -123,7 +169,7 @@ var allFeatures = validFeatures.map(function(feature) {
   var geom = feature.geometry();
   var meanElevation = elevation.reduceRegion({reducer: ee.Reducer.mean(), geometry: geom, scale: 30, maxPixels: 1e13}).get('elevation');
   var meanSlope = slope.reduceRegion({reducer: ee.Reducer.mean(), geometry: geom, scale: 30, maxPixels: 1e13}).get('slope');
-  var area = geom.area().divide(10000); //converting to ha^2 as metres were overwhelming the model
+  var area = geom.area().divide(10000); //converting to ha as metres were overwhelming the model
   return feature.set({
     'elevation': meanElevation,
     'slope': meanSlope,
@@ -133,7 +179,7 @@ var allFeatures = validFeatures.map(function(feature) {
 
 #### Modelling
 
-After filtering all polygons to ensure they contain the necessary data, variables were extracted to conduct principal component analysis in Python to reduce dimensionality and prevent multicollinearity. The resultant random forest model is trained on 70% of the polygons, and has an R^2 of 0.79. It has a low RMSE and MAE relative to the average temperature change, making it suitable for predicting changes in new sites.
+After filtering all polygons to ensure they contain the necessary data, variables were extracted to conduct principal component analysis in Python to reduce dimensionality and prevent multicollinearity. The resultant random forest model is trained on 70% of the polygons, and has an R^2 of 0.79. It has a low RMSE and MAE relative to average temperature change, making it suitable for predicting changes in new sites.
 
 ```js
 //Extract training data
@@ -157,10 +203,7 @@ var model = ee.Classifier.smileRandomForest(100)
     inputProperties: ['NDVI', 'NDBI', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10', 'B11', 'elevation', 'slope', 'area']});
 ```
 
-Cerys to add brief description of method and code
-
-118 words (lmk if it needs cutting)
-Importantly, if users are to select potential sites for aquavoltaic programme expansion, it is imperative that these are actually fish farms. We used a Random Forest model to identify existing fish farms based on Sentinel-2 imagery. The analysis draws from Ballinger’s (2024) informal oil refinery identification application. The model is trained and tested on manually drawn land identification polygons. The resulting prediction data was then exported and uploaded to QGIS where it was manually cleaned. In the prediction tab of the final application, the user’s polygon selection is required to intersect with the fish farm polygons. While the model is not perfectly accurate, it is sufficient in its goal of limiting user input to areas with fish farms.
+If users are to select potential aquavoltaic installation sites, it is imperative that these are actually fish farms. We used a random forest model to identify existing fish farms based on Sentinel-2 imagery, drawing from Ballinger’s (2024) oil refinery identification. The model is trained and tested on manually drawn land identification polygons. The resulting prediction data was then manually cleaned in QGIS. In the prediction tab of the final application, the user’s polygon selection is required to intersect with a fish farm. While the model is not perfectly accurate, it sufficiently limits user input to areas with fish farms.
 
 ```js
 
@@ -190,11 +233,8 @@ var sentinel1 = ee.ImageCollection('COPERNICUS/S1_GRD')
   .mean();
 
 var ndvi=sentinel.normalizedDifference(['B8','B4']).select(['nd'],['ndvi']);
-
 var ndwi=sentinel.normalizedDifference(['B3','B8']).select(['nd'],['ndwi'])
-
 var newBands = ee.Image([ndwi,ndvi,sentinel1.rename('S1_VV')]);
-
 var image=sentinel.addBands(newBands).clip(AOI);
 
 // add AOI and satellite imagery to map
@@ -258,7 +298,7 @@ print('Validation overall accuracy: ', testAccuracy.accuracy())
 
 ### User Interface
 #### UI Structure
-This code builds an interactive user interface (UI) in Google Earth Engine. It structures the app into two main parts: a Main Panel and a Map. The Main Panel includes two navigation buttons (to switch between exploring existing solar farms or predicting impacts for new sites), and a content container that updates to show either statistics cards, charts, and layer controls, or drawing tools for prediction.
+This code builds an interactive user interface (UI) in Google Earth Engine. It structures the app into two main parts: a Main Panel and a Map. The Main Panel includes two navigation buttons (to switch between exploring existing solar farms or predicting impacts for new sites), and a content container that updates to show either statistics, charts, and layer controls, or drawing tools for prediction.
 ```js
 /*
 Root
@@ -361,7 +401,8 @@ var contentContainer = ui.Panel();
 ```
 
 #### UI Visualisation Components
-This code primarily implements a visualization interface for analyzing the impact of solar farms. The main features include: Layer Management — three visualization layers are set up: solar panels, fish ponds, and population estimates. The layerConfigs define display parameters and styles for each layer, while the createLayerControl function enables users to toggle layers on or off. Data Display — the interface shows the total number of solar farms and their installation dates, along with statistic cards and three charts: a histogram of temperature changes, a histogram of population distribution, and a scatter plot showing the relationship between temperature change and area size. Interactive Features — users can click on a solar farm on the map to view detailed information and use the layer control panel to customize the data they wish to display.
+This code builds a visualization interface to analyze solar farm impacts. It features three toggleable layers (solar panels, fish ponds, population estimates) managed by layerConfigs and createLayerControl. It displays solar farm counts, installation dates, statistic cards, and three charts. Users can interactively click farms for details and customize visible data through the control panel.
+
 
 ```js
 //Set solar panel visualisation parameters
@@ -772,7 +813,13 @@ map.onClick(function(coords) {
 });
 ```
 #### UI Prediction Components
-This section implements a prediction interface for analyzing the impact of solar farms on temperature and population. The main features include: Drawing Tools — users can draw a polygon on the map to select an area of interest. Prediction Processing — the model calculates temperature and population changes based on the selected area. Results Display — the interface shows the predicted temperature change, potential population affected, and a detailed summary of the results.
+This section implements a prediction interface for analyzing the impact of solar farms on temperature and population. The main features include: 
+
+1. **Drawing Tools:** users can draw a polygon on the map to select an area of interest. 
+
+2. **Prediction Processing:** the model calculates temperature and population changes based on the selected area. 
+
+3. **Results Display:** the interface shows the predicted temperature change, potential population affected, and a detailed summary of the results.
 
 ```js
 // Initialize default view
@@ -940,7 +987,10 @@ map.drawingTools().onDraw(function(geometry) {
 });
 ```
 
+### Links
+[Final app](https://ee-iantserntw.projects.earthengine.app/view/pv-heat-impact-tracker)
 
+[GithHub repository](https://github.com/jess-es02/SolarAppCode/tree/main)
 
 
 ## References
@@ -954,30 +1004,6 @@ Hsiao, Y.J., Chen, J.L. and Huang, C.T., 2021. What are the challenges and oppor
 
 Šafanda, J., 1999. Ground surface temperature as a function of slope angle and slope orientation and its effect on the subsurface temperature field. Tectonophysics, 306(3-4), pp.367-375.
 
+USGS, 2019. Landsat 8 (L8) Data Users Handbook. Obtained from https://d9-wret.s3.us-west-2.amazonaws.com/assets/palladium/production/s3fs-public/atoms/files/LSDS-1574_L8_Data_Users_Handbook-v5.0.pdf 
+
 Xu, Z., Li, Y., Qin, Y. and Bach, E., 2024. A global assessment of the effects of solar farms on albedo, vegetation, and land surface temperature using remote sensing. Solar Energy, 268, p.112198. [https://doi.org/10.1016/j.solener.2023.112198](https://doi.org/10.1016/j.solener.2023.112198)
-
-
-
-
-```js
-Map.setCenter(35.51898, 33.90153, 15);
-
-Map.setOptions("satellite");
-
-var aoi = ee.Geometry.Point(35.51898, 33.90153).buffer(3000);
-```
-
-You can include images:
-
-![Pixelwise T-Test, 2018](images/beirut_change_2020.jpg)
-
-and math:
-$$ \Large t = {\frac{\overline{x_1}-\overline{x_2}} {\sqrt{\frac{s^2_1}{n_1} + \frac{s^2_2}{n_2}}}} $$
-
-
-
-
-
-
-
-
