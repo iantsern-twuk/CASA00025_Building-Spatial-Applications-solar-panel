@@ -13,13 +13,6 @@ var HRSL_total = ee.ImageCollection('projects/sat-io/open-datasets/hrsl/hrslpop'
 
 // ------ LST Calculations ------
 
-// Cloud mask function
-function cloudMask(img) {
-  var scored = ee.Algorithms.Landsat.simpleCloudScore(img);
-  var mask = scored.select(['cloud']).lte(15);
-  return img.updateMask(mask);
-}
-
 function getLST(geom, start, end) {
   var collection = ee.ImageCollection('LANDSAT/LC08/C02/T1_TOA')
     .filterBounds(geom)

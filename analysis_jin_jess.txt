@@ -1,0 +1,418 @@
+/*
+
+Code to:
+
+1. Calculate temperature change for each polygon
+2. Process other variables, e.g. population and slope
+3. Build and assess model
+4. Function to run model in new sites
+
+*/
+
+// Load feature collections
+var taiwan = ee.FeatureCollection('projects/ee-jess-es/assets/village_tainan');
+
+//For merged model:
+//var solar = ee.FeatureCollection('projects/ee-jess-es/assets/merged_panels2') //All merged panels (folder solar_panel_withoutbuffer on Drive)
+//var polygons = solar.filterBounds(taiwan)
+
+//For non-merged model
+var solar = ee.FeatureCollection('projects/ee-jess-es/assets/polygons_jin2'); //Non-merged panels polygons_jin2
+var polygons = solar.filterBounds(taiwan).limit(310);
+
+// ----- LST change -----
+
+// Cloud masking
+function cloudMask(img) {
+  var scored = ee.Algorithms.Landsat.simpleCloudScore(img);
+  var mask = scored.select(['cloud']).lte(15);
+  return img.updateMask(mask);
+}
+
+// Get LST composite function
+function getLST(geom, start, end) {
+  var collection = ee.ImageCollection('LANDSAT/LC08/C02/T1_TOA')
+    .filterBounds(geom)
+    .filterDate(start, end)
+    .filter(ee.Filter.lt('CLOUD_COVER',25));
+
+  var lstCollection = collection.map(function(img) {
+    var ndvi = img.normalizedDifference(['B5', 'B4']).rename('NDVI');
+    var fv = ndvi.subtract(0).divide(1 - 0).rename('FV');
+    var em = fv.multiply(0.004).add(0.986).rename('EM');
+    var thermal = img.select('B10');
+    var lst = thermal.expression(
+      '(Tb / (1 + (0.00115 * (Tb / 1.438)) * log(Ep))) - 273.15',
+      {
+        'Tb': thermal,
+        'Ep': em
+      }
+    ).rename('LST');
+
+    //Extra variables for the random forest: optical bands, thermal bands, NDBI, and NDVI, FV, EM
+    var optical = img.select(['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7']);
+    var thermalBands = img.select(['B10', 'B11']);
+    var ndbi = img.normalizedDifference(['B6', 'B5']).rename('NDBI');
+    return lst.addBands([ndvi, fv, em, ndbi]).addBands(optical).addBands(thermalBands).copyProperties(img, img.propertyNames());
+  });
+
+  var mean = ee.Image(lstCollection.mean());
+  var bands = mean.bandNames();
+  var hasLST = bands.contains('LST');
+  return ee.Algorithms.If(hasLST, mean.clip(geom), ee.Image().rename('LST').clip(geom));
+}
+
+// Main mapping function for each polygon
+var results = polygons.map(function(feature) {
+  var dateString = ee.String(feature.get('dateright'));
+  var parts = dateString.split('-');
+  var year = ee.Number.parse(parts.get(0));
+  var month = ee.Number.parse(parts.get(1));
+  var day = ee.Number.parse(parts.get(2));
+  var constructDate = ee.Date.fromYMD(year, month, day);
+
+  var preStart = constructDate.advance(-3, 'year');
+  var preEnd = constructDate;
+  var postStart = constructDate.advance(1, 'year');
+  var postEnd = constructDate.advance(4, 'year');
+
+  var geom = feature.geometry();
+  var preImage = ee.Image(getLST(geom, preStart, preEnd));
+  var postImage = ee.Image(getLST(geom, postStart, postEnd));
+  var diff = postImage.select('LST').subtract(preImage.select('LST')).rename('LST_Difference');
+
+  // Reducers for LST calculations
+  var meanPreLSTDict = preImage.select('LST').reduceRegion({
+    reducer: ee.Reducer.mean(),
+    geometry: geom,
+    scale: 30,
+    maxPixels: 1e13
+  });
+
+  var meanPostLSTDict = postImage.select('LST').reduceRegion({
+    reducer: ee.Reducer.mean(),
+    geometry: geom,
+    scale: 30,
+    maxPixels: 1e13
+  });
+
+  var meanDiffDict = diff.reduceRegion({
+    reducer: ee.Reducer.mean(),
+    geometry: geom,
+    scale: 30,
+    maxPixels: 1e13
+  });
+
+  // Reducers for other indices for RF: NDVI, FV, EM, NDBI, optical, and thermal bands
+  var preOpticalDict = preImage.select(['NDVI', 'FV', 'EM', 'NDBI', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10', 'B11']).reduceRegion({
+    reducer: ee.Reducer.mean(),
+    geometry: geom,
+    scale: 30,
+    maxPixels: 1e13
+  });
+
+  var meanPreLST = ee.Algorithms.If(meanPreLSTDict.contains('LST'), meanPreLSTDict.get('LST'), null);
+  var meanPostLST = ee.Algorithms.If(meanPostLSTDict.contains('LST'), meanPostLSTDict.get('LST'), null);
+  var meanDiff = ee.Algorithms.If(meanDiffDict.contains('LST_Difference'), meanDiffDict.get('LST_Difference'), null);
+
+  return feature.set({
+    'mean_preLST': meanPreLST,
+    'mean_postLST': meanPostLST,
+    'mean_LST_diff': meanDiff
+  }).set(preOpticalDict).setGeometry(feature.geometry());
+});
+
+var count = results.size();
+print('Number of features in results:', count);
+
+// Check for features where mean_LST_diff is null or invalid
+var invalidFeatures = results.filter(ee.Filter.or(
+  ee.Filter.eq('mean_LST_diff', null),
+  ee.Filter.eq('mean_preLST', null),
+  ee.Filter.eq('mean_postLST', null)
+));
+print('Number of invalid features:', invalidFeatures.size());
+
+
+// ----- Nearby population -----
+
+//Load population from Data For Good
+var HRSL_total = ee.ImageCollection('projects/sat-io/open-datasets/hrsl/hrslpop').filterBounds(taiwan).median();
+
+//Vulnerable population: sum of 0-5 and 60+
+var HRSL_0_5 = ee.ImageCollection("projects/sat-io/open-datasets/hrsl/hrsl_children_under_five").filterBounds(taiwan).median();
+var HRSL_60plus = ee.ImageCollection("projects/sat-io/open-datasets/hrsl/hrsl_elderly_over_sixty").filterBounds(taiwan).median();
+var HRSL_vulnerable = HRSL_0_5.add(HRSL_60plus).rename('HRSL_vulnerable');
+
+//Calculate population within 730m buffer
+function popBuffer(panel) {
+  var geom = panel.geometry().buffer(730);
+  var totalPop = ee.Number(HRSL_total.reduceRegion({reducer: ee.Reducer.sum(), geometry: geom, scale: 30, maxPixels: 1e13}).get('b1')).round();
+  var vulnerablePop = ee.Number(HRSL_vulnerable.reduceRegion({reducer: ee.Reducer.sum(), geometry: geom, scale: 30, maxPixels: 1e13}).get('HRSL_vulnerable')).round();
+  return panel.set({'total_buffer_pop': totalPop, 'vulnerable_buffer_pop': vulnerablePop });
+}
+var all_results = results.map(popBuffer);
+
+// ----- Summary statistics -------
+
+// Filter numeric entries (postLST values greater than or equal to -273.15)
+var numericPostLST = all_results.filter(ee.Filter.notNull(['mean_preLST']))
+  .filter(ee.Filter.gte('mean_preLST', -273.15)); // Assuming real LST can't be lower than this
+
+// Count numeric entries
+var numericCount = numericPostLST.size();
+
+// Filter non-numeric entries (mean_postLST is null or lower than -273.15)
+var nonNumericPostLST = all_results.filter(ee.Filter.or(
+  ee.Filter.equals('mean_preLST', null),  // Filter for null values
+  ee.Filter.lt('mean_preLST', -273.15)    // Filter for values less than -273.15
+));
+
+// Count non-numeric entries
+var nonNumericCount = nonNumericPostLST.size();
+
+// Print the results
+print('Number of features with numeric mean_postLST:', numericCount);
+print('Number of features with non-numeric mean_postLST:', nonNumericCount);
+
+//Summary statistics
+var lstDiffValues = all_results.aggregate_array('mean_LST_diff');
+
+var averageTempChange = lstDiffValues.reduce(ee.Reducer.mean());
+var maxTempChange = lstDiffValues.reduce(ee.Reducer.max());
+var minTempChange = lstDiffValues.reduce(ee.Reducer.min());
+
+print('Average LST change:', averageTempChange);
+print('Maximum LST change:', maxTempChange);
+print('Minimum LST change:', minTempChange);
+
+// ----- Random forest ------
+
+//Filter for only valid polygons (i.e. containing both pre- and post-LST)
+var validFeatures = results.filter(ee.Filter.and(
+  ee.Filter.neq('mean_LST_diff', null), 
+  ee.Filter.neq('mean_preLST', null),   
+  ee.Filter.neq('mean_postLST', null)    
+));
+
+//Add extra non-Landsat features: elevation, topography, and polygon area
+var srtm = ee.Image('USGS/SRTMGL1_003').clip(taiwan);
+var elevation = srtm.select('elevation');
+var slope = ee.Terrain.slope(srtm);
+
+var allFeatures = validFeatures.map(function(feature) {
+  var geom = feature.geometry();
+  var meanElevation = elevation.reduceRegion({reducer: ee.Reducer.mean(), geometry: geom, scale: 30, maxPixels: 1e13}).get('elevation');
+  var meanSlope = slope.reduceRegion({reducer: ee.Reducer.mean(), geometry: geom, scale: 30, maxPixels: 1e13}).get('slope');
+  var area = geom.area().divide(10000); //converting to hectares^2 as metres were overwhelming the model
+  return feature.set({
+    'elevation': meanElevation,
+    'slope': meanSlope,
+    'area': area});
+});
+
+//Ensure all model features have elevation and slope
+var test = allFeatures.filter(ee.Filter.and(
+  ee.Filter.neq('elevation', null), 
+  ee.Filter.neq('slope', null)));
+print('Number of panels with complete info:', test.size())
+
+//Extract training data
+var bands = test.select(['mean_preLST', 'mean_postLST', 'mean_LST_diff', 'NDVI', 'NDBI', 'FV', 'EM', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10', 'B11', 'elevation', 'slope', 'area'])
+  .randomColumn();
+
+//Define test-train split
+var split=0.7
+var training_sample = bands.filter(ee.Filter.lt('random', split));
+var validation_sample = bands.filter(ee.Filter.gte('random', split));
+
+print('Sample training feature:', training_sample.first())
+
+//Set up RF
+var model = ee.Classifier.smileRandomForest(100)
+  .setOutputMode('REGRESSION')
+  .train({
+    features: training_sample,
+    classProperty: 'mean_postLST', //mean_postLST or mean_LST_diff
+    //removed mean_preLST, EM, FV due to multicollinearity
+    inputProperties: ['NDVI', 'NDBI', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10', 'B11', 'elevation', 'slope', 'area']});
+
+// ----- Assess GOF -----
+//As the practicals dealt with image classification, ChatGPT was used heavily here to find appropriate metrics    
+var validated = validation_sample.classify(model)
+
+//Compare predicted vs actual 
+var predictionVsActual = validated.map(function(feature) {
+  return feature.set({
+    'predicted': feature.get('classification'),
+    'actual': feature.get('mean_postLST')
+  });
+});
+
+//Calculate residuals
+var residuals = predictionVsActual.map(function(f) {
+  var predicted = ee.Number(f.get('predicted'));
+  var actual = ee.Number(f.get('actual'));
+  return f.set('residual', predicted.subtract(actual));
+});
+
+//Calculate RMSE
+var mse = residuals.aggregate_array('residual').map(function(val) {
+  val = ee.Number(val);
+  return val.multiply(val);
+}).reduce(ee.Reducer.mean());
+
+var rmse = ee.Number(mse).sqrt();
+print('Root Mean Square Error (RMSE):', rmse);
+
+//Calculate MAE
+var mae = residuals.aggregate_array('residual').map(function(val) {
+  return ee.Number(val).abs();
+}).reduce(ee.Reducer.mean());
+
+print('Mean Absolute Error (MAE):', mae);
+
+//Calculate R^2
+var meanActual = predictionVsActual.aggregate_array('actual').reduce(ee.Reducer.mean());
+
+var ssTot = predictionVsActual.aggregate_array('actual').map(function(val) {
+  val = ee.Number(val);
+  return val.subtract(meanActual).pow(2);
+}).reduce(ee.Reducer.sum());
+
+var ssRes = residuals.aggregate_array('residual').map(function(val) {
+  val = ee.Number(val);
+  return val.pow(2);
+}).reduce(ee.Reducer.sum());
+
+var r2 = ee.Number(1).subtract(ee.Number(ssRes).divide(ssTot));
+print('R^2 (coefficient of determination):', r2);
+
+// ------ Site selection ------
+
+//Load in fish farms
+var fishfarms = ee.FeatureCollection('projects/ee-jess-es/assets/fish-farms');
+
+// Quick UI
+//Set up panel and add to map
+var panel = ui.Panel({
+  layout: ui.Panel.Layout.flow('vertical'),
+  style: {width: '400px', position: 'bottom-left', stretch: 'vertical'}});
+ui.root.insert(0, panel);
+
+//Add title
+var title = ui.Label('Solar Panel Heat Impacts', {
+  fontWeight: 'bold', fontSize: '30px', textAlign:'center'});
+
+//Add button for drawing new solar panels
+var drawPolygon = ui.Button({
+  label: 'Draw a new solar farm',
+  style: {stretch: 'horizontal', fontSize: '20px'},
+  onClick: function() {
+    
+    //Set up drawing function, clear pre-existing layers
+    var drawingTools = Map.drawingTools();
+    drawingTools.stop();
+    drawingTools.setShown(true);
+    drawingTools.setDrawModes(['polygon']);
+    drawingTools.layers().reset([]); 
+    drawPolygon.setDisabled(true); //prevent any more clicks until the polygon has been drawn
+
+    //Remove any previous polygons before starting drawing
+    if (drawnPolygonLayer) {
+      Map.layers().remove(drawnPolygonLayer);
+      drawnPolygonLayer = null;}
+
+    //start drawing
+    drawingTools.setShape('polygon');
+    drawingTools.draw();
+  }
+});
+
+panel.add(title);
+panel.add(drawPolygon);
+
+//Set up variables for polygons
+var polygonDrawn = false;
+var drawnPolygon = null;
+var drawnPolygonLayer = null;
+
+//Panel calculations
+function checkIntersection(geometry) {
+  //Don't run if it doesn't intersect with a predicted fish farm
+  var intersection = fishfarms.filterBounds(geometry).size().gt(0);
+  if (intersection.getInfo()) {
+    
+    //Calculate population (we need to do this as a feature)
+    var feature = ee.Feature(geometry);
+    var pop = popBuffer(feature);  // Pass the feature to popBuffer
+    print('Estimated total population within 730m:', pop.get('total_buffer_pop'));
+    print('Estimated total vulnerable population within 730m:', pop.get('vulnerable_buffer_pop'));
+    
+    //Calculate current LST, using the function defined before
+    var now = ee.Date(Date.now());
+    var polygonStart = now.advance(-3, 'year');
+    var polygonEnd = now;
+
+    var currentImage = ee.Image(getLST(geometry, polygonStart, polygonEnd));
+    var currentReduced = currentImage.select('LST').reduceRegion({reducer: ee.Reducer.mean(), geometry: geometry, scale: 30, maxPixels: 1e13});
+    var currentLST = currentReduced.get('LST');
+    
+    //Print LST, stopping the function if there's insufficient satellite imagery to do so
+    currentLST.evaluate(function(val) {
+      if (val !== null) {
+        print('Average current temperature (°C):', val.toFixed(2) + '°C'); //ChatGPT helped with formatting
+        
+        //Predict future LST using the model
+        
+        //Get variables from Landsat
+        var bands = ['NDVI', 'NDBI', 'FV', 'EM', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B10', 'B11'];
+        var landsatInfo = currentImage.select(bands).reduceRegion({reducer: ee.Reducer.mean(), geometry: geometry, scale: 30, maxPixels: 1e13});
+        
+        //Add extra variables
+        var meanElevation = elevation.reduceRegion({reducer: ee.Reducer.mean(), geometry: geometry, scale: 30, maxPixels: 1e13 }).get('elevation');
+        var meanSlope = slope.reduceRegion({reducer: ee.Reducer.mean(), geometry: geometry, scale: 30, maxPixels: 1e13 }).get('slope');
+        var area = geometry.area().divide(10000); //ha^2 again
+        var allVars = ee.FeatureCollection([ee.Feature(geometry, landsatInfo).set({ 'elevation': meanElevation, 'slope': meanSlope, 'area': area })]);
+        
+        //Use model
+        var predicted = allVars.classify(model);
+        var predicted_postLST = predicted.first().get('classification');
+        var predictedDiff = ee.Number(predicted_postLST).subtract(currentLST);
+
+        //Print results (ChatGPT helped with formatting these)
+        predicted_postLST.evaluate(function(val) {print('Predicted future temperature (°C):', val.toFixed(2))});
+        predictedDiff.evaluate(function(val) {print('This is a difference of (°C):', val.toFixed(2))});
+      }
+      else {
+      print('Insufficient satellite imagery to calculate LST for this location. Please select a different area');
+
+    }});
+    
+  } else {
+    print('This polygon does not intersect with any fish farms. Please redraw in a different location.');
+  }
+
+  //Configure new polygon on map and reset drawing tools - ChatGPT helped here
+  if (drawnPolygonLayer) {
+    Map.layers().remove(drawnPolygonLayer);
+    drawnPolygonLayer = null;
+  }
+  var drawingTools = Map.drawingTools();
+  drawingTools.stop();
+  drawingTools.setShown(false); //hide drawing tools once the polygon has been drawn
+  drawPolygon.setDisabled(false);
+  drawnPolygonLayer = Map.addLayer(geometry, {}, 'Potential Site');
+  polygonDrawn = true;
+}
+
+//Running the above functions
+Map.drawingTools().onDraw(function(geometry) {
+  
+  checkIntersection(geometry); //check intersection and run subsequent calculations
+
+  //Disable drawing tools so the user can only draw one polygon (unless they press the button)
+  var drawingTools = Map.drawingTools();
+  drawingTools.stop()
+  drawingTools.setShown(false);
+}); 

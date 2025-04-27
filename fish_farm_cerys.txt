@@ -1,0 +1,136 @@
+//Code to identify fish farms
+//GEE link: https://code.earthengine.google.com/2faf6d1dc5888509fa7699da6a774904
+
+Map.setCenter(120.332886, 23.1714785, 10);
+
+var start='2021-04-14';
+var end='2025-04-14';
+var bands = ['B2', 'B3', 'B4','B5','B6','B7','B8', 'B8A','B11','B12'];
+
+var sentinel = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
+                  .filter(ee.Filter.date(start, end))
+                  .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 10))
+                  .mean()
+                  .select(bands);
+                
+var s_rgb = {
+  min: 0.0,
+  max: 3000,
+  bands:['B4', 'B3', 'B2'],
+  opacity:1
+};
+
+var sentinel1 = ee.ImageCollection('COPERNICUS/S1_GRD')
+  .filterBounds(AOI)
+  .filterDate(start, end)
+  .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VV'))
+  .select('VV')
+  .mean();
+
+var ndvi=sentinel.normalizedDifference(['B8','B4']).select(['nd'],['ndvi']);
+
+var ndwi=sentinel.normalizedDifference(['B3','B8']).select(['nd'],['ndwi'])
+
+var newBands = ee.Image([ndwi,ndvi,sentinel1.rename('S1_VV')]);
+
+var image=sentinel.addBands(newBands).clip(AOI);
+
+Map.addLayer(image.clip(AOI), s_rgb, 'Sentinel');
+
+Map.addLayer(AOI,null,"AOI",false);
+
+// Training
+
+var fishfarm_points=ee.FeatureCollection.randomPoints(fishfarms, 3000).map(function(i){
+  return i.set({'class': 0})});
+  
+var urban_points=ee.FeatureCollection.randomPoints(urban, 1000).map(function(i){
+  return i.set({'class': 1})});
+
+  
+var river_points=ee.FeatureCollection.randomPoints(rivers, 2000).map(function(i){
+  return i.set({'class': 2})});  
+
+var sample=ee.FeatureCollection([urban_points,
+                                  fishfarm_points,
+                                  river_points
+                                  ])
+                                  .flatten()
+                                  .randomColumn();
+
+  
+var split=0.7
+var training_sample = sample.filter(ee.Filter.lt('random', split));
+var validation_sample = sample.filter(ee.Filter.gte('random', split));
+
+
+print(training_sample.first())
+// take samples from image for training and validation  
+
+var training = image.sampleRegions({
+  collection: training_sample,
+  properties: ['class'],
+  scale: 10,
+});
+
+var validation = image.sampleRegions({
+  collection: validation_sample,
+  properties: ['class'],
+  scale: 10
+});
+
+var model = ee.Classifier.smileRandomForest(400)
+.train(training, 'class');
+
+var prediction = image.classify(model);
+
+var fishfarm_prediction=prediction.updateMask(prediction.eq(0));
+
+Map.addLayer(fishfarm_prediction,{palette:'red'},'Predicted Fish Farms');
+
+// // --------------------- Step 4: Assess Accuracy --------------------------------
+
+
+var validated = validation.classify(model);
+
+var testAccuracy = validated.errorMatrix('class', 'classification');
+
+print('Confusion Matrix ', testAccuracy);
+print('Validation overall accuracy: ', testAccuracy.accuracy())
+
+var vectors = fishfarm_prediction.reduceToVectors({
+  geometry: AOI,
+  scale: 10,
+  geometryType: 'centroid',
+  eightConnected: true,
+  labelProperty: 'classification',
+  maxPixels:1653602926
+  }).filterBounds(AOI)
+  
+// print("Points in test area:", vectors.filterBounds(test).size())
+
+Map.addLayer(vectors.style({color: 'black', fillColor: '#00f2ff', pointSize:5}),{},'Fish Farm Points',false)
+
+var binary_fishfarm = prediction.eq(0);
+
+Export.image.toDrive({
+  image: binary_fishfarm,
+  region:geometry,
+  description: 'fishfarm_Area1',
+  scale:20
+})
+
+Export.image.toDrive({
+  image: binary_fishfarm,
+  region:geometry2,
+  description: 'fishfarm_Area2',
+  scale:20
+})
+
+/*
+Export.table.toAsset({
+  collection:vectors.filterBounds(AOI),
+  description: 'fishfarm_Points',
+  
+})
+*/
