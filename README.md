@@ -7,17 +7,17 @@ Summary website can be found [here](https://raw.githack.com/iantsern-twuk/CASA00
 
 ### Team Members
 
+- Cerys
 - Chung-En (Ian)
 - Jess
 - Jin
 - Duanduan
-- Cerys
 - Sam
 
 ### Contribution
 
 #### Slide: 
-Duanduan, Jin
+Jin, Duanduan
 
 #### Web page: 
 Cerys, Ian, Jess, Jin
