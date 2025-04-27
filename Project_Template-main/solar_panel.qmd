@@ -43,7 +43,7 @@ The application provides a transparent, accessible tool to foster communication,
 
 :::{.column-page}
 
-<iframe src='https://ollielballinger.users.earthengine.app/view/turkey-earthquake' width='100%' height='700px'></iframe>
+<iframe src='https://ee-iantserntw.projects.earthengine.app/view/pv-heat-impact-tracker' width='100%' height='700px'></iframe>
 
 :::
 
