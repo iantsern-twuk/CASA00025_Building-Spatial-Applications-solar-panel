@@ -12,7 +12,7 @@ Although renewable energy is crucial to meeting Taiwan’s Net Zero goals, land 
 
 ### End User 
 
-This application serves as a participatory planning tool to overcome conflicts between stakeholders with opposing perspectives on aquavoltaic expansion. It does this by openly exploring the PHVI impacts of past and prospective solar farms sites. Alongside expediting planning, helping mitigate local impacts, and supporting Taiwan’s Net Zero goals, additional benefits for each stakeholder are outlined below:
+This application serves as a participatory planning tool to overcome conflicts between stakeholders with opposing perspectives on aquavoltaic expansion. It does this by openly exploring the PHVI impacts of past and prospective solar sites. Alongside expediting planning, helping mitigate local impacts, and supporting Taiwan’s Net Zero goals, additional benefits for each stakeholder are outlined below:
 
 - **National government:** communicating policy; mitigating unfounded concerns.
 - **Local government:** evidence-based assessment of past projects; informed future planning within jurisdictions.
@@ -995,8 +995,6 @@ map.drawingTools().onDraw(function(geometry) {
 
 ## References
 Ballinger, O. (1 January 2024) Refinery Identification [Module content], Building Spatial Applications with Big Data CASA0025, University College London.
-
-Barron-Gafford, G., Minor, R., Allen, N., Cronin, A., Brooks, A., Pavao-Zuckerman, M. and Macknick, J., 2016. The Photovoltaic Heat Island Effect: Larger solar power plants increase local temperatures. Scientific Reports, 6, p.35070. [https://doi.org/10.1038/srep35070](https://doi.org/10.1038/srep35070)
 
 Guoqing, L., Hernandez, R.R., Blackburn, G.A., Davies, G., Hunt, M., Whyatt, J.D. and Armstrong, A., 2021. Ground-mounted photovoltaic solar parks promote land surface cool islands in arid ecosystems. Renewable and Sustainable Energy Transition, 1, p.100008.
 
